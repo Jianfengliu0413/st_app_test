@@ -5,7 +5,7 @@ import time
 import hashlib
 import os
 import json
-from py2ls import fsave
+from py2ls.ips import fsave
 from py2ls import plot
 from streamlit_autorefresh import st_autorefresh
 
