@@ -25,9 +25,9 @@ st.title("🐇 Management System")
 # if os.path.isfile("./dat/breeding_data.csv"):
 #     fsave("./dat/breeding_data.csv",pd.DataFrame())
 # File paths
-USER_FILE = "/Users/macjianfeng/Dropbox/github/python/py2ls/tests/test_netfinder/jax_info/dat/users.json"
-BREEDING_FILE = "/Users/macjianfeng/Dropbox/github/python/py2ls/tests/test_netfinder/jax_info/dat/breeding_data.csv"
-REMINDERS_FILE = "/Users/macjianfeng/Dropbox/github/python/py2ls/tests/test_netfinder/jax_info/dat/reminders.json"
+USER_FILE = "./dat/users.json"
+BREEDING_FILE = "./dat/breeding_data.csv"
+REMINDERS_FILE = "./dat/reminders.json"
 
 # Function to hash passwords
 def hash_password(password):
