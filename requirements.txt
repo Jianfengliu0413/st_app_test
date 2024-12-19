@@ -1,4 +1,4 @@
-py2ls==0.2.4.30
+py2ls
 streamlit
 pandas
 streamlit-autorefresh
