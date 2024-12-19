@@ -1,5 +1,5 @@
 scipy
-py2lspy2ls==0.2.4.31
+py2ls==0.2.4.31
 streamlit
 pandas
 streamlit-autorefresh
