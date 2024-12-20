@@ -33,21 +33,26 @@ REMINDERS_FILE = "./dat/reminders.json"
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-# Load or initialize user database
+ 
+@st.cache_data
+def load_user_data(file_path):
+    if os.path.exists(file_path):
+        with open(file_path, "r") as f:
+            return json.load(f)
+    return {"admin": hash_password("admin123"), "user": hash_password("user123")}
+
 if "users" not in st.session_state:
-    if os.path.exists(USER_FILE):
-        with open(USER_FILE, "r") as f:
-            st.session_state.users = json.load(f)
-    else:
-        st.session_state.users = {"admin": hash_password("admin123"), "user": hash_password("user123")}
+    st.session_state.users = load_user_data(USER_FILE)
 
 # Load or initialize breeding data
-if "breeding_data" not in st.session_state:
-    if os.path.exists(BREEDING_FILE):
+@st.cache_data
+def load_breeding_data(file_path):
+    if os.path.exists(file_path):
         try:
-            st.session_state.breeding_data = pd.read_csv(BREEDING_FILE, parse_dates=["Date Set Up", "Expected Delivery"])
-        except:
-            st.session_state.breeding_data = pd.DataFrame({
+            return pd.read_csv(file_path, parse_dates=["Date Set Up", "Expected Delivery"])
+        except Exception:
+            # Default DataFrame in case of error
+            return pd.DataFrame({
                 "Breeding Pair": ["Pair 1", "Pair 2", "Pair 3"],
                 "Male ID": ["M001", "M002", "M003"],
                 "Female ID": ["F001", "F002", "F003"],
@@ -55,15 +60,24 @@ if "breeding_data" not in st.session_state:
                 "Pregnancy Status": ["Pregnant", "Not Pregnant", "Pregnant"],
                 "Expected Delivery": [datetime.date(2024, 1, 22), None, datetime.date(2024, 2, 1)],
                 "Litter Size": [8, 0, 6]
-            })  
+            })
+    return pd.DataFrame()  # Empty DataFrame if the file doesn't exist
+
+if "breeding_data" not in st.session_state:
+    st.session_state.breeding_data = load_breeding_data(BREEDING_FILE)
+
 
 # Load or initialize reminders
+@st.cache_data
+def load_reminders(file_path):
+    if os.path.exists(file_path):
+        with open(file_path, "r") as f:
+            return json.load(f)
+    return []
+
 if "reminders" not in st.session_state:
-    if os.path.exists(REMINDERS_FILE):
-        with open(REMINDERS_FILE, "r") as f:
-            st.session_state.reminders = json.load(f)
-    else:
-        st.session_state.reminders = []
+    st.session_state.reminders = load_reminders(REMINDERS_FILE)
+
 
 # Function to save data
 def save_users():
@@ -146,8 +160,8 @@ st.write("Welcome to the advanced mice breeding management system!")
 st_autorefresh(interval=2000, limit=100, key="fizzbuzzcounter")
 
 # Function: Calculate Weaning Dates 
+@st.cache_data
 def calculate_weaning_date(delivery_date):
-    print(f"Type of delivery_date: {type(delivery_date)}")  # Debugging
     if isinstance(delivery_date, (datetime.date, datetime.datetime)):
         return delivery_date + datetime.timedelta(days=21)
     return None
@@ -156,6 +170,7 @@ breeding_df = st.session_state.breeding_data
 breeding_df["Weaning Date"] = breeding_df["Expected Delivery"].apply(
     lambda x: calculate_weaning_date(x) if pd.notnull(x) else None
 )
+ 
 
 # Section 1: Display Current Breeding Data
 st.header("📋 Current Breeding Data")
