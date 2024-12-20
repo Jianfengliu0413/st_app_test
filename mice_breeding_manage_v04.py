@@ -77,7 +77,7 @@ def save_reminders():
     with open(REMINDERS_FILE, "w") as f:
         json.dump(st.session_state.reminders, f)
 
-time_out=1200 # 2min
+time_out=12000 # 2min
 
 # Login System
 if "authenticated" not in st.session_state:
