@@ -157,7 +157,7 @@ if st.session_state.authenticated and time.time() - st.session_state.last_login_
 # * data management
 st.header("📋 Data Management")
 st.write("Welcome to the advanced mice breeding management system!")
-st_autorefresh(interval=2000, limit=100, key="fizzbuzzcounter")
+st_autorefresh(interval=time_out, limit=100, key="fizzbuzzcounter")
 
 # Function: Calculate Weaning Dates 
 @st.cache_data
