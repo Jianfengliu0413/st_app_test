@@ -251,7 +251,6 @@ with st.sidebar.form("task_form"):
         save_reminders()  # Save to file
         st.sidebar.success("✅ Reminder added successfully!")
 
-
 # Show reminders as a tickable list
 st.header("🔔 Active Reminders")
 if st.button("Clear Completed Reminders"):
