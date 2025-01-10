@@ -172,10 +172,7 @@ breeding_df["Weaning Date"] = breeding_df["Expected Delivery"].apply(
 )
  
 
-# Section 1: Display Current Breeding Data
-st.header("📋 Current Breeding Data")
-# st.dataframe(breeding_df.tail(5))
-st.table(breeding_df.iloc[-5:,:])
+
 #! plot section
 df2plot=breeding_df.copy()
 st.bar_chart(data=df2plot.tail(10),x="Pregnancy Status",y='Litter Size')
@@ -224,6 +221,10 @@ with st.sidebar.form("update_status_form"):
         st.session_state.breeding_data = breeding_df
         save_breeding_data()  # Save to file
         st.success("✅ Pregnancy status updated!")
+# Section 1: Display Current Breeding Data
+st.header("📋 Current Breeding Data")
+# st.dataframe(breeding_df.tail(5))
+st.table(breeding_df.iloc[-5:,:])
 
 # Section 4: Task Scheduler with Tick List
 st.sidebar.header("🗓️ Task Scheduler")
