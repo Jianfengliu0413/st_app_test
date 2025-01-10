@@ -170,23 +170,35 @@ breeding_df = st.session_state.breeding_data
 breeding_df["Weaning Date"] = breeding_df["Expected Delivery"].apply(
     lambda x: calculate_weaning_date(x) if pd.notnull(x) else None
 )
- 
 
 # Section 1: Display Current Breeding Data
 st.header("📋 Current Breeding Data")
-# st.dataframe(breeding_df.tail(5))
-st.table(breeding_df.iloc[-5:,:])
-#! plot section
-df2plot=breeding_df.copy()
-st.bar_chart(data=df2plot.tail(10),x="Pregnancy Status",y='Litter Size')
-for col in ["Date Set Up","Expected Delivery","Weaning Date"]:
-    df2plot[col]=df2plot[col].astype(str)
-fig, ax  = plt.subplots(figsize=[4,2])
-sns.lineplot(data=df2plot, x='Date Set Up',y="Litter Size",ax=ax)
-sns.lineplot(data=df2plot, x='Expected Delivery',y="Litter Size",ax=ax)
-sns.lineplot(data=df2plot, x='Weaning Date',y="Litter Size",ax=ax)
-plot.figsets(xangle=90,ax=ax,figsize=8)
-st.pyplot(fig)
+
+if "breeding_data" in st.session_state:
+    # Add weaning dates dynamically
+    st.session_state.breeding_data["Weaning Date"] = st.session_state.breeding_data["Expected Delivery"].apply(
+        lambda x: calculate_weaning_date(x) if pd.notnull(x) else None
+    )
+    # Display the latest data
+    st.table(st.session_state.breeding_data.iloc[-5:, :])
+
+    # Plot updated data
+    df2plot = st.session_state.breeding_data.copy()
+    st.bar_chart(data=df2plot.tail(10), x="Pregnancy Status", y='Litter Size')
+
+    # Update columns to string format for line plot compatibility
+    for col in ["Date Set Up", "Expected Delivery", "Weaning Date"]:
+        df2plot[col] = df2plot[col].astype(str)
+
+    fig, ax = plt.subplots(figsize=[4, 2])
+    sns.lineplot(data=df2plot, x='Date Set Up', y="Litter Size", ax=ax)
+    sns.lineplot(data=df2plot, x='Expected Delivery', y="Litter Size", ax=ax)
+    sns.lineplot(data=df2plot, x='Weaning Date', y="Litter Size", ax=ax)
+    plot.figsets(xangle=90, ax=ax, figsize=8)
+    st.pyplot(fig)
+else:
+    st.write("No breeding data available.")
+ 
 # Section 2: Add a New Breeding Pair
 st.sidebar.header("➕ Add New Breeding Pair")
 with st.sidebar.form("add_pair_form"):
