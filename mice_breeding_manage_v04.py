@@ -199,7 +199,7 @@ def display_data():
         st.pyplot(fig)
     else:
         st.write("No breeding data available.")
- def add_new_pair():
+def add_new_pair():
     # Section 2: Add a New Breeding Pair
     st.sidebar.header("➕ Add New Breeding Pair")
     with st.sidebar.form("add_pair_form"):
