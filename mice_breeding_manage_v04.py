@@ -282,3 +282,8 @@ def show_reminder():
             if completed:
                 st.session_state.reminders[i]["Completed"] = True
                 save_reminders()  # Save to file
+
+add_new_pair()
+scheduler()
+show_reminder()
+display_data()
