@@ -91,7 +91,7 @@ def save_reminders():
     with open(REMINDERS_FILE, "w") as f:
         json.dump(st.session_state.reminders, f)
 
-time_out=12000 # 2min
+time_out=120000 # 2min
 
 # Login System
 if "authenticated" not in st.session_state:
@@ -157,7 +157,7 @@ if st.session_state.authenticated and time.time() - st.session_state.last_login_
 # * data management
 st.header("📋 Data Management")
 st.write("Welcome to the advanced mice breeding management system!")
-st_autorefresh(interval=time_out, limit=100, key="fizzbuzzcounter")
+#st_autorefresh(interval=time_out, limit=100, key="fizzbuzzcounter")
 
 # Function: Calculate Weaning Dates 
 @st.cache_data
