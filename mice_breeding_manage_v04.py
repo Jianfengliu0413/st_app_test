@@ -224,6 +224,8 @@ with st.sidebar.form("update_status_form"):
         st.session_state.breeding_data = breeding_df
         save_breeding_data()  # Save to file
         st.success("✅ Pregnancy status updated!")
+        if st.button("Update Status"):
+            st.rerun()
 
 # Section 4: Task Scheduler with Tick List
 st.sidebar.header("🗓️ Task Scheduler")
