@@ -170,120 +170,100 @@ breeding_df = st.session_state.breeding_data
 breeding_df["Weaning Date"] = breeding_df["Expected Delivery"].apply(
     lambda x: calculate_weaning_date(x) if pd.notnull(x) else None
 )
+ 
 
-def display_data():
-    # Section 1: Display Current Breeding Data
-    st.header("📋 Current Breeding Data")
-    
-    if "breeding_data" in st.session_state:
-        # Add weaning dates dynamically
-        st.session_state.breeding_data["Weaning Date"] = st.session_state.breeding_data["Expected Delivery"].apply(
-            lambda x: calculate_weaning_date(x) if pd.notnull(x) else None
-        )
-        # Display the latest data
-        st.table(st.session_state.breeding_data.iloc[-5:, :])
-    
-        # Plot updated data
-        df2plot = st.session_state.breeding_data.copy()
-        st.bar_chart(data=df2plot.tail(10), x="Pregnancy Status", y='Litter Size')
-    
-        # Update columns to string format for line plot compatibility
-        for col in ["Date Set Up", "Expected Delivery", "Weaning Date"]:
-            df2plot[col] = df2plot[col].astype(str)
-    
-        fig, ax = plt.subplots(figsize=[4, 2])
-        sns.lineplot(data=df2plot, x='Date Set Up', y="Litter Size", ax=ax)
-        sns.lineplot(data=df2plot, x='Expected Delivery', y="Litter Size", ax=ax)
-        sns.lineplot(data=df2plot, x='Weaning Date', y="Litter Size", ax=ax)
-        plot.figsets(xangle=90, ax=ax, figsize=8)
-        st.pyplot(fig)
-    else:
-        st.write("No breeding data available.")
-def add_new_pair():
-    # Section 2: Add a New Breeding Pair
-    st.sidebar.header("➕ Add New Breeding Pair")
-    with st.sidebar.form("add_pair_form"):
-        male_id = st.text_input("Male ID", placeholder="M004")
-        female_id = st.text_input("Female ID", placeholder="F004")
-        date_set_up = st.date_input("Date Set Up", value=datetime.date.today())
-        submit_new_pair = st.form_submit_button("Add Pair")
-        if submit_new_pair:
-            new_pair = {
-                "Breeding Pair": f"Pair {len(breeding_df) + 1}",
-                "Male ID": male_id,
-                "Female ID": female_id,
-                "Date Set Up": date_set_up,
-                "Pregnancy Status": "Not Pregnant",
-                "Expected Delivery": None,
-                "Litter Size": 0
-            }
-            breeding_df = pd.concat([breeding_df, pd.DataFrame([new_pair])], ignore_index=True)
-            st.session_state.breeding_data = breeding_df
-            save_breeding_data()  # Save to file
-            st.success("✅ New breeding pair added!")
-def update_pregnacy():
-    # Section 3: Update Pregnancy Status
-    st.sidebar.header("✏️ Update Pregnancy Status")
-    with st.sidebar.form("update_status_form"):
-        pair_to_update = st.selectbox("Select Breeding Pair", breeding_df.sort_index(ascending=False)["Breeding Pair"])
-        new_status = st.selectbox("Pregnancy Status", ["Not Pregnant", "Pregnant"])
-        delivery_date = st.date_input("Expected Delivery Date", value=datetime.date.today())
-        litter_size = st.number_input("Litter Size (if known)", min_value=0, value=5)
-        submit_status_update = st.form_submit_button("Update Status")
-        if submit_status_update:
-            breeding_df.loc[breeding_df["Breeding Pair"] == pair_to_update, "Pregnancy Status"] = new_status
-            breeding_df.loc[breeding_df["Breeding Pair"] == pair_to_update, "Expected Delivery"] = delivery_date
-            breeding_df.loc[breeding_df["Breeding Pair"] == pair_to_update, "Litter Size"] = litter_size
-            st.session_state.breeding_data = breeding_df
-            save_breeding_data()  # Save to file
-            st.success("✅ Pregnancy status updated!")
-            #if st.button("Update Status"):
-                #st.rerun()
-def scheduler():
-    # Section 4: Task Scheduler with Tick List
-    st.sidebar.header("🗓️ Task Scheduler")
-    # Add Reminder
-    with st.sidebar.form("task_form"):
-        reminder_text = st.text_input("Task Description", placeholder="E.g., Check Pair 1")
-        reminder_date = st.date_input("Date", 
-                                      value=datetime.date.today()
-                                      )
-        reminder_time = st.time_input("Time", 
-                                      value=datetime.time(8, 45),#None,#
-                                      step=3600
-                                      )
-        add_reminder = st.form_submit_button("Set Reminder")
-        if add_reminder:
-            reminder_date = datetime.datetime.combine(reminder_date, reminder_time)  # Combine date and time
-            new_reminder = {"Task": reminder_text, "Date": str(reminder_date), "Completed": False}
-            if isinstance(st.session_state.reminders, list):
-                # Append the new reminder
-                st.session_state.reminders.append(new_reminder)
-            else:
-                # Reinitialize as a list if it's not
-                st.session_state.reminders = [new_reminder]
-            save_reminders()  # Save to file
-            st.sidebar.success("✅ Reminder added successfully!")
+# Section 1: Display Current Breeding Data
+st.header("📋 Current Breeding Data")
+# st.dataframe(breeding_df.tail(5))
+st.table(breeding_df.iloc[-5:,:])
+#! plot section
+df2plot=breeding_df.copy()
+st.bar_chart(data=df2plot.tail(10),x="Pregnancy Status",y='Litter Size')
+for col in ["Date Set Up","Expected Delivery","Weaning Date"]:
+    df2plot[col]=df2plot[col].astype(str)
+fig, ax  = plt.subplots(figsize=[4,2])
+sns.lineplot(data=df2plot, x='Date Set Up',y="Litter Size",ax=ax)
+sns.lineplot(data=df2plot, x='Expected Delivery',y="Litter Size",ax=ax)
+sns.lineplot(data=df2plot, x='Weaning Date',y="Litter Size",ax=ax)
+plot.figsets(xangle=90,ax=ax,figsize=8)
+st.pyplot(fig)
+# Section 2: Add a New Breeding Pair
+st.sidebar.header("➕ Add New Breeding Pair")
+with st.sidebar.form("add_pair_form"):
+    male_id = st.text_input("Male ID", placeholder="M004")
+    female_id = st.text_input("Female ID", placeholder="F004")
+    date_set_up = st.date_input("Date Set Up", value=datetime.date.today())
+    submit_new_pair = st.form_submit_button("Add Pair")
+    if submit_new_pair:
+        new_pair = {
+            "Breeding Pair": f"Pair {len(breeding_df) + 1}",
+            "Male ID": male_id,
+            "Female ID": female_id,
+            "Date Set Up": date_set_up,
+            "Pregnancy Status": "Not Pregnant",
+            "Expected Delivery": None,
+            "Litter Size": 0
+        }
+        breeding_df = pd.concat([breeding_df, pd.DataFrame([new_pair])], ignore_index=True)
+        st.session_state.breeding_data = breeding_df
+        save_breeding_data()  # Save to file
+        st.success("✅ New breeding pair added!")
 
-def show_reminder():
-    # Show reminders as a tickable list
-    st.header("🔔 Active Reminders")
-    if st.button("Clear Completed Reminders"):
-        st.session_state.reminders = [r for r in st.session_state.reminders if not r["Completed"]]
-        save_reminders()  # Save to file
-        st.success("✅ Completed reminders cleared!")
-    for i, reminder in enumerate(st.session_state.reminders):
-        col1, col2 = st.columns([20, 1])
-        if reminder["Completed"]:
-            # col1.markdown(f"<span style='color:#00BB00;background-color:yellow'>~~{reminder['Task']} (Due: {reminder['Date']})~~", unsafe_allow_html=True)
-            col1.markdown(f"""{reminder['Task']} ~~:rainbow[(Due: {reminder['Date']})]~~""", unsafe_allow_html=True)
+# Section 3: Update Pregnancy Status
+st.sidebar.header("✏️ Update Pregnancy Status")
+with st.sidebar.form("update_status_form"):
+    pair_to_update = st.selectbox("Select Breeding Pair", breeding_df.sort_index(ascending=False)["Breeding Pair"])
+    new_status = st.selectbox("Pregnancy Status", ["Not Pregnant", "Pregnant"])
+    delivery_date = st.date_input("Expected Delivery Date", value=datetime.date.today())
+    litter_size = st.number_input("Litter Size (if known)", min_value=0, value=5)
+    submit_status_update = st.form_submit_button("Update Status")
+    if submit_status_update:
+        breeding_df.loc[breeding_df["Breeding Pair"] == pair_to_update, "Pregnancy Status"] = new_status
+        breeding_df.loc[breeding_df["Breeding Pair"] == pair_to_update, "Expected Delivery"] = delivery_date
+        breeding_df.loc[breeding_df["Breeding Pair"] == pair_to_update, "Litter Size"] = litter_size
+        st.session_state.breeding_data = breeding_df
+        save_breeding_data()  # Save to file
+        st.success("✅ Pregnancy status updated!")
+
+# Section 4: Task Scheduler with Tick List
+st.sidebar.header("🗓️ Task Scheduler")
+# Add Reminder
+with st.sidebar.form("task_form"):
+    reminder_text = st.text_input("Task Description", placeholder="E.g., Check Pair 1")
+    reminder_date = st.date_input("Date", 
+                                  value=datetime.date.today()
+                                  )
+    reminder_time = st.time_input("Time", 
+                                  value=datetime.time(8, 45),#None,#
+                                  step=3600
+                                  )
+    add_reminder = st.form_submit_button("Set Reminder")
+    if add_reminder:
+        reminder_date = datetime.datetime.combine(reminder_date, reminder_time)  # Combine date and time
+        new_reminder = {"Task": reminder_text, "Date": str(reminder_date), "Completed": False}
+        if isinstance(st.session_state.reminders, list):
+            # Append the new reminder
+            st.session_state.reminders.append(new_reminder)
         else:
-            completed = col1.checkbox(f"{reminder['Task']} (Due: {reminder['Date']})", key=f"reminder_{i}")
-            if completed:
-                st.session_state.reminders[i]["Completed"] = True
-                save_reminders()  # Save to file
+            # Reinitialize as a list if it's not
+            st.session_state.reminders = [new_reminder]
+        save_reminders()  # Save to file
+        st.sidebar.success("✅ Reminder added successfully!")
 
-add_new_pair()
-scheduler()
-show_reminder()
-display_data()
+
+# Show reminders as a tickable list
+st.header("🔔 Active Reminders")
+if st.button("Clear Completed Reminders"):
+    st.session_state.reminders = [r for r in st.session_state.reminders if not r["Completed"]]
+    save_reminders()  # Save to file
+    st.success("✅ Completed reminders cleared!")
+for i, reminder in enumerate(st.session_state.reminders):
+    col1, col2 = st.columns([20, 1])
+    if reminder["Completed"]:
+        # col1.markdown(f"<span style='color:#00BB00;background-color:yellow'>~~{reminder['Task']} (Due: {reminder['Date']})~~", unsafe_allow_html=True)
+        col1.markdown(f"""{reminder['Task']} ~~:rainbow[(Due: {reminder['Date']})]~~""", unsafe_allow_html=True)
+    else:
+        completed = col1.checkbox(f"{reminder['Task']} (Due: {reminder['Date']})", key=f"reminder_{i}")
+        if completed:
+            st.session_state.reminders[i]["Completed"] = True
+            save_reminders()  # Save to file
